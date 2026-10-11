@@ -1,0 +1,77 @@
+@page "/restaurants/{Id:int}/review"
+@inject FakeRestaurantService RestaurantService
+@inject NavigationManager Navigation
+
+<PageTitle>Add Review</PageTitle>
+
+@if (restaurant is null)
+{
+    <h1>Restaurant Not Found</h1>
+    <a href="/restaurants">Back to Restaurants</a>
+}
+else
+{
+    <h1>Add Review for @restaurant.Name</h1>
+
+    <EditForm Model="reviewModel" OnValidSubmit="HandleAddReview">
+        <div class="form-group">
+            <label>Review</label>
+            <InputTextArea class="input textarea" @bind-Value="reviewModel.Text" />
+        </div>
+
+        <button class="button" type="submit">Add Review</button>
+        <a class="button secondary" href="/restaurants/@restaurant.Id">Cancel</a>
+    </EditForm>
+
+    @if (reviewAdded)
+    {
+        <p class="success">Review added successfully.</p>
+    }
+
+    <div class="card">
+        <h2>Current Reviews</h2>
+        @if (restaurant.Reviews.Count == 0)
+        {
+            <p>No reviews yet.</p>
+        }
+        else
+        {
+            <ul>
+                @foreach (var review in restaurant.Reviews)
+                {
+                    <li>@review</li>
+                }
+            </ul>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Restaurant? restaurant;
+    private ReviewModel reviewModel = new();
+    private bool reviewAdded;
+
+    protected override void OnParametersSet()
+    {
+        restaurant = RestaurantService.GetById(Id);
+    }
+
+    private void HandleAddReview()
+    {
+        if (restaurant is not null)
+        {
+            RestaurantService.AddReview(Id, reviewModel.Text);
+            reviewModel = new ReviewModel();
+            reviewAdded = true;
+            restaurant = RestaurantService.GetById(Id);
+        }
+    }
+
+    private class ReviewModel
+    {
+        public string Text { get; set; } = "";
+    }
+}

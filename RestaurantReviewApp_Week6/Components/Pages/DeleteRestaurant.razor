@@ -1,0 +1,40 @@
+@page "/restaurants/{Id:int}/delete"
+@inject FakeRestaurantService RestaurantService
+@inject NavigationManager Navigation
+
+<PageTitle>Delete Restaurant</PageTitle>
+
+@if (restaurant is null)
+{
+    <h1>Restaurant Not Found</h1>
+    <a href="/restaurants">Back to Restaurants</a>
+}
+else
+{
+    <h1>Delete Restaurant</h1>
+    <div class="warning">
+        <p>Are you sure you want to delete <strong>@restaurant.Name</strong>?</p>
+        <p>This removes the restaurant from the fake data set.</p>
+    </div>
+
+    <button class="button danger" @onclick="HandleDelete">Yes, Delete</button>
+    <a class="button secondary" href="/restaurants">Cancel</a>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Restaurant? restaurant;
+
+    protected override void OnParametersSet()
+    {
+        restaurant = RestaurantService.GetById(Id);
+    }
+
+    private void HandleDelete()
+    {
+        RestaurantService.Delete(Id);
+        Navigation.NavigateTo("/restaurants");
+    }
+}

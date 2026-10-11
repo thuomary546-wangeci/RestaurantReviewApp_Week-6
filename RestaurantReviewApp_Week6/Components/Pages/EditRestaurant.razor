@@ -1,0 +1,76 @@
+@page "/restaurants/{Id:int}/edit"
+@inject FakeRestaurantService RestaurantService
+@inject NavigationManager Navigation
+
+<PageTitle>Edit Restaurant</PageTitle>
+
+@if (restaurant is null)
+{
+    <h1>Restaurant Not Found</h1>
+    <a href="/restaurants">Back to Restaurants</a>
+}
+else
+{
+    <h1>Edit Restaurant</h1>
+
+    <EditForm Model="restaurant" OnValidSubmit="HandleUpdate">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label>Restaurant Name</label>
+            <InputText class="input" @bind-Value="restaurant.Name" />
+        </div>
+
+        <div class="form-group">
+            <label>Location</label>
+            <InputText class="input" @bind-Value="restaurant.Location" />
+        </div>
+
+        <div class="form-group">
+            <label>Cuisine Type</label>
+            <InputText class="input" @bind-Value="restaurant.CuisineType" />
+        </div>
+
+        <div class="form-group">
+            <label>Rating</label>
+            <InputNumber class="input" @bind-Value="restaurant.Rating" />
+        </div>
+
+        <button class="button" type="submit">Update Restaurant</button>
+        <a class="button secondary" href="/restaurants">Cancel</a>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Restaurant? restaurant;
+
+    protected override void OnParametersSet()
+    {
+        var source = RestaurantService.GetById(Id);
+
+        restaurant = source is null
+            ? null
+            : new Restaurant
+            {
+                Id = source.Id,
+                Name = source.Name,
+                Location = source.Location,
+                CuisineType = source.CuisineType,
+                Rating = source.Rating,
+                Reviews = new List<string>(source.Reviews)
+            };
+    }
+
+    private void HandleUpdate()
+    {
+        if (restaurant is not null)
+        {
+            RestaurantService.Update(restaurant);
+            Navigation.NavigateTo("/restaurants");
+        }
+    }
+}

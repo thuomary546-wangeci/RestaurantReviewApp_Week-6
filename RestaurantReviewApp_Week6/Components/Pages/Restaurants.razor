@@ -1,0 +1,47 @@
+@page "/restaurants"
+@inject FakeRestaurantService RestaurantService
+
+<PageTitle>Restaurants</PageTitle>
+
+<div class="page-heading">
+    <div>
+        <h1>All Restaurants</h1>
+        <p>Fake data is used for this week's UI. The API will be connected next week.</p>
+    </div>
+    <a class="button" href="/restaurants/add">Add Restaurant</a>
+</div>
+
+@if (restaurants.Count == 0)
+{
+    <p>No restaurants are available.</p>
+}
+else
+{
+    <div class="restaurant-grid">
+        @foreach (var restaurant in restaurants)
+        {
+            <article class="card">
+                <h2>@restaurant.Name</h2>
+                <p><strong>Location:</strong> @restaurant.Location</p>
+                <p><strong>Cuisine:</strong> @restaurant.CuisineType</p>
+                <p><strong>Rating:</strong> @restaurant.Rating.ToString("0.0") / 5</p>
+
+                <div class="actions">
+                    <a href="/restaurants/@restaurant.Id">Details</a>
+                    <a href="/restaurants/@restaurant.Id/edit">Edit</a>
+                    <a href="/restaurants/@restaurant.Id/delete">Delete</a>
+                    <a href="/restaurants/@restaurant.Id/review">Add Review</a>
+                </div>
+            </article>
+        }
+    </div>
+}
+
+@code {
+    private List<Restaurant> restaurants = new();
+
+    protected override void OnInitialized()
+    {
+        restaurants = RestaurantService.GetAll();
+    }
+}
